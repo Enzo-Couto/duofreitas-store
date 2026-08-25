@@ -7,7 +7,10 @@ from app.schemas.product import ProductCreate
 def get_products(db: Session):
     return (
         db.query(Product)
-        .options(joinedload(Product.images))
+        .options(
+            joinedload(Product.images),
+            joinedload(Product.category)
+        )
         .filter(Product.active == True)
         .all()
     )
@@ -19,6 +22,10 @@ def get_product_by_slug(
 ):
     return (
         db.query(Product)
+        .options(
+            joinedload(Product.images),
+            joinedload(Product.category)
+        )
         .filter(Product.slug == slug)
         .first()
     )
@@ -34,7 +41,8 @@ def create_product(
         description=product_data.description,
         price=product_data.price,
         stock=product_data.stock,
-        active=product_data.active
+        active=product_data.active,
+        category_id=product_data.category_id
     )
 
     db.add(product)

@@ -5,7 +5,8 @@ from sqlalchemy import (
     Numeric,
     Boolean,
     DateTime,
-    func
+    func,
+    ForeignKey,
 )
 from sqlalchemy.orm import relationship
 
@@ -44,8 +45,17 @@ class Product(Base):
         back_populates="product"
     )
 
+    category_id = Column(
+        Integer,
+        ForeignKey("categories.id")
+    )
+
+    category = relationship(
+        "Category",
+        back_populates="products"
+    )
+
     images = relationship(
         "ProductImage",
-        back_populates="product",
-        cascade="all, delete-orphan"
+        back_populates="product"
     )
