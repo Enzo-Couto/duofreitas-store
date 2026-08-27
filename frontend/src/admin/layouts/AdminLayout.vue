@@ -1,3 +1,10 @@
+<script setup>
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+
+import AdminSidebar from '../components/AdminSidebar.vue'
+</script>
+
 <template>
   <div class="admin-layout">
     <AdminSidebar />
@@ -7,10 +14,6 @@
     </main>
   </div>
 </template>
-
-<script setup>
-import AdminSidebar from "../components/AdminSidebar.vue"
-</script>
 
 <style scoped>
 .admin-layout {

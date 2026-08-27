@@ -10,6 +10,10 @@ export default {
     return api.get('/products')
   },
 
+  getBySlug(slug) {
+    return api.get(`/products/slug/${slug}`)
+  },
+
   create(data) {
     return api.post('/products/', data)
   },

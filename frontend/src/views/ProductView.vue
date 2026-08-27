@@ -1,53 +1,58 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
 import AppNavbar from '@/components/layout/AppNavbar.vue'
-import ProductCard from '@/components/product/ProductCard.vue'
 
 import { useCartStore } from '@/stores/cart'
-import { products } from '@/data/products'
+import productService from '@/admin/services/productService'
 
 const route = useRoute()
-const router = useRouter()
 const cartStore = useCartStore()
 
-const product = products.find(
-  p => p.id === Number(route.params.id)
-)
-
-if (!product) {
-  throw new Error('Produto não encontrado')
-}
-
-const currentProduct = product
-
-const relatedProducts = products
-  .filter(p => p.id !== currentProduct.id)
-  .slice(0, 4)
+const currentProduct = ref<any>(null)
 
 const quantity = ref(1)
-
-const selectedImage = ref(currentProduct.frontImage)
+const selectedImage = ref('')
+const selectedSize = ref('M')
 
 const sizes = ['P', 'M', 'G', 'GG']
 
-const selectedSize = ref('M')
-
 const isAnimatingToCart = ref(false)
 
-function openProduct(productId: number) {
-  router.push(`/product/${productId}`)
+async function loadProduct() {
+  try {
+    const response = await productService.getBySlug(
+      route.params.slug as string
+    )
+
+    currentProduct.value = response.data
+
+    if (
+      currentProduct.value.images &&
+      currentProduct.value.images.length
+    ) {
+      selectedImage.value =
+        'http://127.0.0.1:8000' +
+        currentProduct.value.images[0].image_url
+    }
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 function addToCart() {
+  if (!currentProduct.value) {
+    return
+  }
+
   cartStore.addItem({
-    id: currentProduct.id,
-    name: currentProduct.name,
-    price: currentProduct.price,
+    id: currentProduct.value.id,
+    name: currentProduct.value.name,
+    price: currentProduct.value.price,
     size: selectedSize.value,
     quantity: quantity.value,
-    image: currentProduct.frontImage,
+    image: selectedImage.value
   })
 
   isAnimatingToCart.value = true
@@ -56,49 +61,47 @@ function addToCart() {
     isAnimatingToCart.value = false
   }, 800)
 }
+
+onMounted(loadProduct)
 </script>
 
 <template>
   <AppNavbar />
 
-  <main class="mx-auto max-w-7xl px-6 py-32">
+  <main
+    v-if="currentProduct"
+    class="mx-auto max-w-7xl px-6 py-32"
+  >
     <div class="grid gap-12 lg:grid-cols-2">
 
       <!-- Galeria -->
 
       <div class="grid gap-4 lg:grid-cols-[120px_1fr]">
         <div class="flex gap-3 lg:flex-col">
-          <button
-            @click="selectedImage = currentProduct.frontImage"
-            class="cursor-pointer overflow-hidden rounded-2xl border-2 transition"
-            :class="
-              selectedImage === currentProduct.frontImage
-                ? 'border-black'
-                : 'border-zinc-200'
-            "
-          >
-            <img
-              :src="currentProduct.frontImage"
-              alt="Frente"
-              class="h-28 w-28 object-cover"
-            />
-          </button>
-
-          <button
-            @click="selectedImage = currentProduct.backImage"
-            class="cursor-pointer overflow-hidden rounded-2xl border-2 transition"
-            :class="
-              selectedImage === currentProduct.backImage
-                ? 'border-black'
-                : 'border-zinc-200'
-            "
-          >
-            <img
-              :src="currentProduct.backImage"
-              alt="Costas"
-              class="h-28 w-28 object-cover"
-            />
-          </button>
+            <button
+              v-for="image in currentProduct.images"
+              :key="image.id"
+              @click="
+                selectedImage =
+                  'http://127.0.0.1:8000' +
+                  image.image_url
+              "
+              class="cursor-pointer overflow-hidden rounded-2xl border-2 transition"
+              :class="
+                selectedImage ===
+                'http://127.0.0.1:8000' + image.image_url
+                  ? 'border-black'
+                  : 'border-zinc-200'
+              "
+            >
+              <img
+                :src="
+                  'http://127.0.0.1:8000' +
+                  image.image_url
+                "
+                class="h-28 w-28 object-cover"
+              />
+            </button>
         </div>
 
         <div
@@ -120,7 +123,7 @@ function addToCart() {
         </h1>
 
         <p class="mt-4 text-3xl font-semibold">
-          R$ {{ currentProduct.price.toFixed(2).replace('.', ',') }}
+          R$ {{ Number(currentProduct.price).toFixed(2).replace('.', ',') }}
         </p>
 
         <div class="mt-10">
@@ -195,39 +198,6 @@ function addToCart() {
         </div>
       </div>
     </div>
-
-    <!-- Produtos Relacionados -->
-
-    <section class="mt-32">
-      <div class="mb-10">
-        <h2 class="text-4xl font-bold">
-          Você também pode gostar
-        </h2>
-
-        <p class="mt-2 text-zinc-500">
-          Descubra outros produtos da coleção Duo Freitas.
-        </p>
-      </div>
-
-      <div
-        class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4"
-      >
-        <div
-          v-for="relatedProduct in relatedProducts"
-          :key="relatedProduct.id"
-          class="cursor-pointer"
-          @click="openProduct(relatedProduct.id)"
-        >
-          <ProductCard
-            :front-image="relatedProduct.frontImage"
-            :back-image="relatedProduct.backImage"
-            :name="relatedProduct.name"
-            :price="`R$ ${relatedProduct.price.toFixed(2).replace('.', ',')}`"
-          />
-        </div>
-      </div>
-    </section>
-
     <!-- Animação -->
 
     <Transition name="fly-to-cart">

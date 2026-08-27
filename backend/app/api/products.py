@@ -187,3 +187,25 @@ def delete_product_image(
     return {
         "message": "Imagem removida"
     }
+
+
+@router.get(
+    "/products/slug/{slug}",
+    response_model=ProductResponse
+)
+def get_product_by_slug_route(
+    slug: str,
+    db: Session = Depends(get_db)
+):
+    product = get_product_by_slug(
+        db,
+        slug
+    )
+
+    if not product:
+        raise HTTPException(
+            status_code=404,
+            detail="Produto não encontrado."
+        )
+
+    return product

@@ -7,9 +7,6 @@ import router from './router'
 
 import Toast from 'vue-toastification'
 
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'
-
 import 'vue-toastification/dist/index.css'
 import './assets/styles/main.css'
 
