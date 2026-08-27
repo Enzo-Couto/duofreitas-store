@@ -25,18 +25,16 @@ class ProductImage(Base):
 
     product_id = Column(
         Integer,
-        ForeignKey("products.id"),
+        ForeignKey(
+            "products.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 
     image_url = Column(
         String(500),
         nullable=False
-    )
-
-    is_primary = Column(
-        Boolean,
-        default=False
     )
 
     sort_order = Column(
@@ -52,4 +50,10 @@ class ProductImage(Base):
     product = relationship(
         "Product",
         back_populates="images"
+    )
+
+    image_type = Column(
+        String(20),
+        nullable=False,
+        default='gallery'
     )

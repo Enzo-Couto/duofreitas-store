@@ -47,7 +47,11 @@ class Product(Base):
 
     category_id = Column(
         Integer,
-        ForeignKey("categories.id")
+        ForeignKey(
+            "categories.id",
+            ondelete="SET NULL"
+        ),
+        nullable=True
     )
 
     category = relationship(
@@ -57,5 +61,7 @@ class Product(Base):
 
     images = relationship(
         "ProductImage",
-        back_populates="product"
+        back_populates="product",
+        cascade="all, delete-orphan",
+        passive_deletes=True
     )

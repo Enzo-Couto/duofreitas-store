@@ -7,7 +7,6 @@ from app.schemas.product_image import ProductImageResponse
 
 class ProductCreate(BaseModel):
     name: str
-    slug: str
     description: str
     price: float
     stock: int
@@ -31,3 +30,6 @@ class ProductResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+class ProductUpdate(ProductCreate):
+    pass

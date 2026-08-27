@@ -1,7 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class CategoryCreate(BaseModel):
+    name: str
+    slug: str
+
+
+class CategoryUpdate(BaseModel):
     name: str
     slug: str
 
@@ -11,6 +16,4 @@ class CategoryResponse(BaseModel):
     name: str
     slug: str
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = ConfigDict(from_attributes=True)

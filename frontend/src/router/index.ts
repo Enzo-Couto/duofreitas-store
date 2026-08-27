@@ -35,6 +35,33 @@ const router = createRouter({
       path: '/order-success',
       name: 'order-success',
       component: OrderSuccessView,
+    },
+    {
+      path: "/admin",
+      component: () =>
+        import("@/admin/layouts/AdminLayout.vue"),
+      children: [
+        {
+          path: "",
+          component: () =>
+            import("@/admin/pages/Dashboard.vue")
+        },
+        {
+          path: "products",
+          component: () =>
+            import("@/admin/pages/Products.vue")
+        },
+        {
+          path: "categories",
+          component: () =>
+            import("@/admin/pages/Categories.vue")
+        },
+        {
+          path: "orders",
+          component: () =>
+            import("@/admin/pages/Orders.vue")
+        }
+      ]
     }
   ],
 
