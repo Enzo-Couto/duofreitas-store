@@ -2,6 +2,8 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { createOrder } from '@/services/orders'
+
 import AppNavbar from '@/components/layout/AppNavbar.vue'
 
 import { useCartStore } from '@/stores/cart'
@@ -26,8 +28,71 @@ function formatPrice(value: number) {
   return value.toFixed(2).replace('.', ',')
 }
 
-function proceedPayment() {
-  router.push('/order-success')
+async function proceedPayment() {
+
+  const payload = {
+    customer_name:
+      checkoutStore.customer.name,
+
+    customer_email:
+      checkoutStore.customer.email,
+
+    customer_phone:
+      checkoutStore.customer.phone,
+
+    customer_cpf:
+      checkoutStore.customer.cpf,
+
+    cep:
+      checkoutStore.address.cep,
+
+    street:
+      checkoutStore.address.street,
+
+    number:
+      checkoutStore.address.number,
+
+    complement:
+      checkoutStore.address.complement,
+
+    neighborhood:
+      checkoutStore.address.neighborhood,
+
+    city:
+      checkoutStore.address.city,
+
+    state:
+      checkoutStore.address.state,
+
+    items: cartStore.items.map(
+      item => ({
+        product_id: item.id,
+        quantity: item.quantity
+      })
+    )
+  }
+
+  try {
+
+    const order =
+      await createOrder(payload)
+
+    checkoutStore.orderId =
+      order.id
+
+    cartStore.clearCart()
+
+    router.push('/order-success')
+
+  } catch (error) {
+
+    console.error(error)
+
+    alert(
+      'Erro ao criar pedido'
+    )
+
+  }
 }
 
 if (

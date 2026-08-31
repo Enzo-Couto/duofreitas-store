@@ -3,7 +3,11 @@ import { useRouter } from 'vue-router'
 
 import AppNavbar from '@/components/layout/AppNavbar.vue'
 
+import { useCheckoutStore } from '@/stores/checkout'
+
 const router = useRouter()
+
+const checkoutStore = useCheckoutStore()
 
 function continueShopping() {
   router.push('/')
@@ -64,7 +68,7 @@ function continueShopping() {
         <p
           class="mt-2 text-2xl font-bold"
         >
-          #{{ Date.now() }}
+          #{{ checkoutStore.orderId }}
         </p>
       </div>
 

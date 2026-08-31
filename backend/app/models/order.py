@@ -20,6 +20,46 @@ class Order(Base):
     customer_email = Column(String(255), nullable=False)
     customer_phone = Column(String(30), nullable=False)
 
+    customer_cpf = Column(
+        String(14),
+        nullable=False
+    )
+
+    cep = Column(
+        String(9),
+        nullable=False
+    )
+
+    street = Column(
+        String(255),
+        nullable=False
+    )
+
+    number = Column(
+        String(20),
+        nullable=False
+    )
+
+    complement = Column(
+        String(255),
+        nullable=True
+    )
+
+    neighborhood = Column(
+        String(255),
+        nullable=False
+    )
+
+    city = Column(
+        String(255),
+        nullable=False
+    )
+
+    state = Column(
+        String(2),
+        nullable=False
+    )
+
     subtotal = Column(
         Numeric(10, 2),
         nullable=False

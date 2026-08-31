@@ -1,18 +1,59 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import ProductCard from '@/components/product/ProductCard.vue'
 import ProductQuickView from '@/components/product/ProductQuickView.vue'
 
-import { products } from '@/data/products'
+import productService from '@/admin/services/productService'
 
 const router = useRouter()
 
+const products = ref([])
 const selectedProduct = ref<any>(null)
 
-function openProduct(productId: number) {
-  router.push(`/product/${productId}`)
+async function loadProducts() {
+  try {
+    const response =
+      await productService.getAll()
+
+    products.value =
+      response.data
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+function getFrontImage(product: any) {
+  const image =
+    product.images?.find(
+      (img: any) =>
+        img.image_type === 'front'
+    )
+
+  return image
+    ? 'http://127.0.0.1:8000' +
+        image.image_url
+    : ''
+}
+
+function getBackImage(product: any) {
+  const image =
+    product.images?.find(
+      (img: any) =>
+        img.image_type === 'back'
+    )
+
+  return image
+    ? 'http://127.0.0.1:8000' +
+        image.image_url
+    : getFrontImage(product)
+}
+
+function openProduct(product: any) {
+  router.push(
+    `/product/${product.slug}`
+  )
 }
 
 function openQuickView(product: any) {
@@ -22,6 +63,8 @@ function openQuickView(product: any) {
 function closeQuickView() {
   selectedProduct.value = null
 }
+
+onMounted(loadProducts)
 </script>
 
 <template>
@@ -47,16 +90,16 @@ function closeQuickView() {
         <div
           v-for="product in products"
           :key="product.id"
-          @click="openProduct(product.id)"
+          @click="openProduct(product)"
           class="cursor-pointer"
         >
-          <ProductCard
-            :front-image="product.frontImage"
-            :back-image="product.backImage"
-            :name="product.name"
-            :price="`R$ ${product.price.toFixed(2).replace('.', ',')}`"
-            @quick-view="openQuickView(product)"
-          />
+            <ProductCard
+              :front-image="getFrontImage(product)"
+              :back-image="getBackImage(product)"
+              :name="product.name"
+              :price="`R$ ${Number(product.price).toFixed(2).replace('.', ',')}`"
+              @quick-view="openQuickView(product)"
+            />
         </div>
       </div>
     </div>

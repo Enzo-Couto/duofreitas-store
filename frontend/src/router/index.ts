@@ -37,6 +37,11 @@ const router = createRouter({
       component: OrderSuccessView,
     },
     {
+      path: "/admin/login",
+      component: () =>
+        import("@/admin/pages/Login.vue")
+    },
+    {
       path: "/admin",
       component: () =>
         import("@/admin/layouts/AdminLayout.vue"),
@@ -71,6 +76,39 @@ const router = createRouter({
       behavior: 'smooth',
     }
   },
+})
+
+router.beforeEach((to, from, next) => {
+
+  const token =
+    localStorage.getItem(
+      'admin_token'
+    )
+
+  const isAdminRoute =
+    to.path.startsWith('/admin')
+
+  const isLoginRoute =
+    to.path === '/admin/login'
+
+  if (
+    isAdminRoute &&
+    !isLoginRoute &&
+    !token
+  ) {
+    return next(
+      '/admin/login'
+    )
+  }
+
+  if (
+    isLoginRoute &&
+    token
+  ) {
+    return next('/admin')
+  }
+
+  next()
 })
 
 export default router

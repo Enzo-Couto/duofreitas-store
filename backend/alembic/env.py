@@ -25,6 +25,7 @@ from app.models.order import Order
 from app.models.order_item import OrderItem
 from app.models.product_image import ProductImage
 from app.models.category import Category
+from app.models.admin_user import AdminUser
 
 target_metadata = Base.metadata
 

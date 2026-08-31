@@ -107,11 +107,11 @@ onMounted(loadProduct)
         <div
           class="overflow-hidden rounded-3xl bg-zinc-100"
         >
-          <img
-            :src="selectedImage"
-            :alt="currentProduct.name"
-            class="w-full transition duration-500 hover:scale-105"
-          />
+            <img
+              :src="selectedImage"
+              :alt="currentProduct.name"
+              class="h-[800px] w-full object-cover transition duration-500 hover:scale-105"
+            />
         </div>
       </div>
 

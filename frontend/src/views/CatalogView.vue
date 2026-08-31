@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Search } from 'lucide-vue-next'
 
@@ -7,37 +7,121 @@ import AppNavbar from '@/components/layout/AppNavbar.vue'
 import ProductCard from '@/components/product/ProductCard.vue'
 import ProductQuickView from '@/components/product/ProductQuickView.vue'
 
-import { products } from '@/data/products'
+import productService from '@/admin/services/productService'
 
 const router = useRouter()
 
 const search = ref('')
 
-const selectedProduct = ref(null)
+const selectedProduct = ref<any>(null)
+
+const products = ref<any[]>([])
+
+async function loadProducts() {
+  try {
+    const response =
+      await productService.getAll()
+
+    products.value =
+      response.data
+  } catch (error) {
+    console.error(error)
+  }
+}
 
 const filteredProducts = computed(() => {
   if (!search.value.trim()) {
-    return products
+    return products.value
   }
 
-  return products.filter(product =>
+  return products.value.filter(product =>
     product.name
       .toLowerCase()
-      .includes(search.value.toLowerCase())
+      .includes(
+        search.value.toLowerCase()
+      )
   )
 })
 
-function openProduct(id: number) {
-  router.push(`/product/${id}`)
+const productsByCategory = computed(() => {
+  const groups: Record<
+    string,
+    any[]
+  > = {}
+
+  filteredProducts.value.forEach(
+    product => {
+
+      const category =
+        product.category?.name ||
+        'Sem categoria'
+
+      if (!groups[category]) {
+        groups[category] = []
+      }
+
+      groups[category].push(
+        product
+      )
+    }
+  )
+
+  return groups
+})
+
+function getFrontImage(
+  product: any
+) {
+  const image =
+    product.images?.find(
+      (img: any) =>
+        img.image_type === 'front'
+    )
+
+  return image
+    ? 'http://127.0.0.1:8000' +
+        image.image_url
+    : ''
 }
 
-function openQuickView(product: any) {
-  selectedProduct.value = product
+function getBackImage(
+  product: any
+) {
+  const image =
+    product.images?.find(
+      (img: any) =>
+        img.image_type === 'back'
+    )
+
+  return image
+    ? 'http://127.0.0.1:8000' +
+        image.image_url
+    : getFrontImage(product)
+}
+
+function openProduct(
+  product: any
+) {
+  router.push(
+    `/product/${product.slug}`
+  )
+}
+
+function openQuickView(
+  product: any
+) {
+  selectedProduct.value =
+    product
 }
 
 function closeQuickView() {
-  selectedProduct.value = null
+  selectedProduct.value =
+    null
 }
+
+onMounted(
+  loadProducts
+)
 </script>
 
 <template>
@@ -82,21 +166,33 @@ function closeQuickView() {
     <!-- Produtos -->
 
     <div
-      class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4"
+      v-for="(categoryProducts, categoryName) in productsByCategory"
+      :key="categoryName"
+      class="mb-20"
     >
-      <div
-        v-for="product in filteredProducts"
-        :key="product.id"
-        class="cursor-pointer"
-        @click="openProduct(product.id)"
+      <h2
+        class="mb-8 border-b pb-3 text-3xl font-bold"
       >
+        {{ categoryName }}
+      </h2>
+
+      <div
+        class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        <div
+          v-for="product in categoryProducts"
+          :key="product.id"
+          class="cursor-pointer"
+          @click="openProduct(product)"
+        >
           <ProductCard
-            :front-image="product.frontImage"
-            :back-image="product.backImage"
+            :front-image="getFrontImage(product)"
+            :back-image="getBackImage(product)"
             :name="product.name"
-            :price="`R$ ${product.price.toFixed(2).replace('.', ',')}`"
+            :price="`R$ ${Number(product.price).toFixed(2).replace('.', ',')}`"
             @quick-view="openQuickView(product)"
           />
+        </div>
       </div>
     </div>
 
