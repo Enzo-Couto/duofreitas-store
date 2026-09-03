@@ -1,13 +1,13 @@
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException
+    HTTPException,
+    status
 )
 
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-
 from app.models.admin_user import AdminUser
 
 from app.schemas.auth import (
@@ -28,7 +28,9 @@ router = APIRouter(
 
 @router.post(
     "/login",
-    response_model=TokenResponse
+    response_model=TokenResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Login do administrador"
 )
 def login(
     credentials: LoginRequest,
@@ -37,15 +39,14 @@ def login(
     admin = (
         db.query(AdminUser)
         .filter(
-            AdminUser.email ==
-            credentials.email
+            AdminUser.email == credentials.email
         )
         .first()
     )
 
     if not admin:
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Credenciais inválidas"
         )
 
@@ -54,18 +55,18 @@ def login(
         admin.password_hash
     ):
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Credenciais inválidas"
         )
 
-    token = create_access_token(
+    access_token = create_access_token(
         {
             "sub": str(admin.id),
             "email": admin.email
         }
     )
 
-    return {
-        "access_token": token,
-        "token_type": "bearer"
-    }
+    return TokenResponse(
+        access_token=access_token,
+        token_type="bearer"
+    )

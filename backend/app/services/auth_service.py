@@ -12,7 +12,9 @@ def authenticate_user(
     db: Session,
     email: str,
     password: str
-):
+) -> dict | None:
+
+    email = email.lower().strip()
 
     user = (
         db.query(AdminUser)
@@ -22,23 +24,24 @@ def authenticate_user(
         .first()
     )
 
-    if not user:
-        return None
-
-    if not verify_password(
-        password,
-        user.password_hash
+    if (
+        not user
+        or not verify_password(
+            password,
+            user.password_hash
+        )
     ):
         return None
 
-    token = create_access_token(
+    access_token = create_access_token(
         {
             "sub": str(user.id),
-            "email": user.email
+            "email": user.email,
+            "type": "admin"
         }
     )
 
     return {
-        "access_token": token,
+        "access_token": access_token,
         "token_type": "bearer"
     }

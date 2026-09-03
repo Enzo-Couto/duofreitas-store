@@ -65,3 +65,27 @@ class Product(Base):
         cascade="all, delete-orphan",
         passive_deletes=True
     )
+
+    weight = Column(
+        Numeric(10, 3),
+        nullable=False,
+        default=0.1
+    )
+
+    height = Column(
+        Integer,
+        nullable=False,
+        default=1
+    )
+
+    width = Column(
+        Integer,
+        nullable=False,
+        default=1
+    )
+
+    length = Column(
+        Integer,
+        nullable=False,
+        default=1
+    )

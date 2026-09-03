@@ -10,32 +10,32 @@ export default {
     return api.get('/products')
   },
 
-  getBySlug(slug) {
+  getBySlug(slug: string) {
     return api.get(`/products/slug/${slug}`)
   },
 
-  create(data) {
+  create(data: any) {
     return api.post('/products/', data)
   },
 
-  update(id, data) {
+  update(id: number, data: any) {
     return api.put(`/products/${id}`, data)
   },
 
-  remove(id) {
+  remove(id: number) {
     return api.delete(`/products/${id}`)
   },
 
-  deleteImage(imageId) {
+  deleteImage(imageId: number) {
     return api.delete(
       `/products/images/${imageId}`
     )
   },
 
   uploadImage(
-    productId,
-    file,
-    imageType
+    productId: number,
+    file: File,
+    imageType: string
   ) {
 
     const formData = new FormData()

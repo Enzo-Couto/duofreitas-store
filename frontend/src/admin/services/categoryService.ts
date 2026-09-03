@@ -9,15 +9,15 @@ export default {
     return api.get('/categories')
   },
 
-  create(data) {
+  create(data: any) {
     return api.post('/categories', data)
   },
 
-  remove(id) {
+  remove(id: number) {
     return api.delete(`/categories/${id}`)
   },
 
-  update(id, data) {
+  update(id: number, data: any) {
     return api.put(`/categories/${id}`, data)
   }
 }

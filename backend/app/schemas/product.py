@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from pydantic import BaseModel
 
 from app.schemas.category import CategoryResponse
@@ -11,17 +9,28 @@ class ProductCreate(BaseModel):
     price: float
     stock: int
     active: bool = True
+    weight: float
+    height: int
+    width: int
+    length: int
 
     category_id: int | None = None
 
 class ProductResponse(BaseModel):
     id: int
+
     name: str
     slug: str
     description: str
+
     price: float
     stock: int
     active: bool
+
+    weight: float
+    height: int
+    width: int
+    length: int
 
     category: CategoryResponse | None = None
 

@@ -9,7 +9,13 @@ import productService from '@/admin/services/productService'
 
 const router = useRouter()
 
-const products = ref([])
+interface Product {
+  id: number
+  name: string
+  price: number
+}
+
+const products = ref<Product[]>([])
 const selectedProduct = ref<any>(null)
 
 async function loadProducts() {

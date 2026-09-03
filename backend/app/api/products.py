@@ -68,7 +68,10 @@ def upload_product_image(
             detail="Produto não encontrado"
         )
 
-    image_url = save_product_image(file)
+    image_url = save_product_image(
+        file=file,
+        product_id=product.id
+    )
 
     image = ProductImage(
         product_id=product.id,

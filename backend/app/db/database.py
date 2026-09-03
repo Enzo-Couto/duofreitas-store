@@ -1,11 +1,20 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-DATABASE_URL = (
-    "postgresql://postgres:postgres123@localhost:5432/duofreitas"
+from sqlalchemy import (
+    create_engine
 )
 
-engine = create_engine(DATABASE_URL)
+from sqlalchemy.orm import (
+    sessionmaker
+)
+
+from app.core.config import (
+    DATABASE_URL
+)
+
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=3600
+)
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -15,9 +24,11 @@ SessionLocal = sessionmaker(
 
 
 def get_db():
+
     db = SessionLocal()
 
     try:
         yield db
+
     finally:
         db.close()

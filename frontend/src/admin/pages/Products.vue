@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
 
@@ -9,27 +9,88 @@ import categoryService from '../services/categoryService'
 
 const toast = useToast()
 
-const products = ref([])
-const categories = ref([])
+interface SelectedImage {
+  id?: number
+  file?: File
+  preview: string
+  type: 'front' | 'back' | 'gallery'
+  existing?: boolean
+}
 
-const editingId = ref(null)
+interface ProductImage {
+  id: number
+  image_url: string
+  image_type: string
+}
 
-const form = ref({
+interface Category {
+  id: number
+  name: string
+}
+
+interface Product {
+  id: number
+  name: string
+  slug: string
+  description: string
+
+  price: number
+  stock: number
+  active: boolean
+
+  weight: number
+  height: number
+  width: number
+  length: number
+
+  category?: Category | null
+  images?: ProductImage[]
+}
+
+interface ProductForm {
+  name: string
+  description: string
+  price: number
+  stock: number
+  active: boolean
+
+  weight: number
+  height: number
+  width: number
+  length: number
+
+  category_id: number | null
+}
+
+const products = ref<Product[]>([])
+const categories = ref<Category[]>([])
+
+const editingId = ref<number | null>(null)
+
+const form = ref<ProductForm>({
   name: '',
   description: '',
   price: 0,
   stock: 0,
   active: true,
+
+  weight: 0.1,
+  height: 1,
+  width: 1,
+  length: 1,
+
   category_id: null
 })
 
-const selectedImages = ref([])
+const selectedImages = ref<SelectedImage[]>([])
 
-function handleImages(event) {
+function handleImages(event: Event) {
 
-  const files = Array.from(
-    event.target.files
-  )
+  const target = event.target as HTMLInputElement
+
+  if (!target.files) return
+
+  const files = Array.from(target.files)
 
   files.forEach(file => {
 
@@ -47,7 +108,7 @@ function handleImages(event) {
   })
 }
 
-async function removeImage(index) {
+async function removeImage(index: number) {
 
   const image =
     selectedImages.value[index]
@@ -77,7 +138,7 @@ async function removeImage(index) {
       'Imagem removida'
     )
 
-  } catch (error) {
+  } catch (error:any) {
 
     console.error(error)
 
@@ -100,7 +161,7 @@ async function loadProducts() {
 
     products.value = response.data
 
-  } catch (error) {
+  } catch (error:any) {
     console.error(error)
 
     toast.error(
@@ -114,7 +175,7 @@ async function loadCategories() {
       await categoryService.getAll()
 
     categories.value = response.data
-  } catch (error) {
+  } catch (error:any) {
     console.error(error)
 
     toast.error(
@@ -123,7 +184,7 @@ async function loadCategories() {
   }
 }
 
-function editProduct(product) {
+function editProduct(product: Product) {
 
   editingId.value = product.id
 
@@ -133,6 +194,12 @@ function editProduct(product) {
     price: Number(product.price),
     stock: product.stock,
     active: product.active,
+
+    weight: Number(product.weight),
+    height: product.height,
+    width: product.width,
+    length: product.length,
+
     category_id: product.category?.id || null
   }
 
@@ -141,7 +208,7 @@ function editProduct(product) {
   ).map(image => ({
     id: image.id,
     preview: `http://127.0.0.1:8000${image.image_url}`,
-    type: image.image_type,
+    type: image.image_type as 'front' | 'back' | 'gallery',
     existing: true
   }))
 
@@ -158,6 +225,12 @@ function resetForm() {
     price: 0,
     stock: 0,
     active: true,
+
+    weight: 0.1,
+    height: 1,
+    width: 1,
+    length: 1,
+
     category_id: null
   }
 
@@ -235,6 +308,10 @@ async function saveProduct() {
 
       for (const image of selectedImages.value) {
 
+        if (!image.file) {
+          continue
+        }
+
         await productService.uploadImage(
           productId,
           image.file,
@@ -261,6 +338,10 @@ async function saveProduct() {
 
     if (modalEl) {
 
+      if (!modalEl) {
+        return
+      }
+
       const modalInstance =
         Modal.getOrCreateInstance(modalEl)
 
@@ -281,7 +362,7 @@ async function saveProduct() {
       }, 300)
     }
 
-  } catch (error) {
+  } catch (error: any) {
 
     console.error('ERRO COMPLETO:', error)
 
@@ -327,13 +408,17 @@ function openModal() {
   const modalEl =
     document.getElementById('productModal')
 
+  if (!modalEl) {
+    return
+  }
+
   const modal =
     Modal.getOrCreateInstance(modalEl)
 
   modal.show()
 }
 
-async function deleteProduct(id) {
+async function deleteProduct(id: number) {
 
   const confirmed = confirm(
     'Deseja realmente excluir este produto?'
@@ -353,7 +438,7 @@ async function deleteProduct(id) {
 
     await loadProducts()
 
-  } catch (error) {
+  } catch (error: any) {
 
     console.error(error)
 
@@ -451,7 +536,7 @@ onMounted(async () => {
                       p => p.category
                     )
                     .map(
-                      p => p.category.id
+                      p => p.category!.id
                     )
                 )].length
               }}
@@ -483,6 +568,8 @@ onMounted(async () => {
                 <th>Produto</th>
                 <th>Preço</th>
                 <th>Estoque</th>
+                <th>Peso</th>
+                <th>Dimensões</th>
                 <th>Categoria</th>
                 <th>Status</th>
                 <th width="180">
@@ -522,6 +609,14 @@ onMounted(async () => {
 
                 <td>
                   {{ product.stock }}
+                </td>
+
+                <td>
+                    {{ product.weight }} kg
+                </td>
+
+                <td>
+                    {{ product.height }} x {{ product.width }} x {{ product.length }}
                 </td>
 
                 <td>
@@ -656,29 +751,78 @@ onMounted(async () => {
                 />
               </div>
 
-              <div class="col-md-3">
-                <label class="form-label">
-                  Preço
-                </label>
+              <!-- Linha 1 -->
 
-                <input
-                  v-model="form.price"
-                  type="text"
-                  class="form-control"
-                  placeholder="0,00"
-                />
+              <div class="row mb-3">
+
+                <div class="col-md-3">
+                  <label class="form-label">Preço</label>
+
+                  <input
+                    v-model="form.price"
+                    type="number"
+                    step="0.01"
+                    class="form-control"
+                  >
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label">Estoque</label>
+
+                  <input
+                    v-model="form.stock"
+                    type="number"
+                    class="form-control"
+                  >
+                </div>
+
               </div>
 
-              <div class="col-md-3">
-                <label class="form-label">
-                  Estoque
-                </label>
+              <!-- Linha 2 -->
 
-                <input
-                  v-model="form.stock"
-                  type="number"
-                  class="form-control"
-                >
+              <div class="row mb-3">
+
+                <div class="col-md-3">
+                  <label class="form-label">Peso (kg)</label>
+
+                  <input
+                    v-model="form.weight"
+                    type="number"
+                    step="0.001"
+                    class="form-control"
+                  >
+                </div>
+
+                <div class="col-md-2">
+                  <label class="form-label">Altura</label>
+
+                  <input
+                    v-model="form.height"
+                    type="number"
+                    class="form-control"
+                  >
+                </div>
+
+                <div class="col-md-2">
+                  <label class="form-label">Largura</label>
+
+                  <input
+                    v-model="form.width"
+                    type="number"
+                    class="form-control"
+                  >
+                </div>
+
+                <div class="col-md-2">
+                  <label class="form-label">Comprimento</label>
+
+                  <input
+                    v-model="form.length"
+                    type="number"
+                    class="form-control"
+                  >
+                </div>
+
               </div>
 
               <div class="col-12">
