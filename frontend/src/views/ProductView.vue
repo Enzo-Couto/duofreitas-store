@@ -10,6 +10,8 @@ import productService from '@/admin/services/productService'
 const route = useRoute()
 const cartStore = useCartStore()
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const currentProduct = ref<any>(null)
 
 const quantity = ref(1)
@@ -33,7 +35,7 @@ async function loadProduct() {
       currentProduct.value.images.length
     ) {
       selectedImage.value =
-        'http://127.0.0.1:8000' +
+        API_URL +
         currentProduct.value.images[0].image_url
     }
   } catch (error) {
@@ -83,20 +85,20 @@ onMounted(loadProduct)
               :key="image.id"
               @click="
                 selectedImage =
-                  'http://127.0.0.1:8000' +
+                  API_URL +
                   image.image_url
               "
               class="cursor-pointer overflow-hidden rounded-2xl border-2 transition"
               :class="
                 selectedImage ===
-                'http://127.0.0.1:8000' + image.image_url
+                API_URL + image.image_url
                   ? 'border-black'
                   : 'border-zinc-200'
               "
             >
               <img
                 :src="
-                  'http://127.0.0.1:8000' +
+                  API_URL +
                   image.image_url
                 "
                 class="h-28 w-28 object-cover"

@@ -207,7 +207,7 @@ function editProduct(product: Product) {
     product.images || []
   ).map(image => ({
     id: image.id,
-    preview: `http://127.0.0.1:8000${image.image_url}`,
+    preview: `${import.meta.env.VITE_API_URL}${image.image_url}`,
     type: image.image_type as 'front' | 'back' | 'gallery',
     existing: true
   }))

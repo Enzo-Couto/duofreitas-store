@@ -38,7 +38,7 @@ function getFrontImage(product: any) {
     )
 
   return image
-    ? 'http://127.0.0.1:8000' +
+    ? import.meta.env.VITE_API_URL +
         image.image_url
     : ''
 }
@@ -51,7 +51,7 @@ function getBackImage(product: any) {
     )
 
   return image
-    ? 'http://127.0.0.1:8000' +
+    ? import.meta.env.VITE_API_URL +
         image.image_url
     : getFrontImage(product)
 }

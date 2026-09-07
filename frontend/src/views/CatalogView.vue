@@ -9,6 +9,8 @@ import ProductQuickView from '@/components/product/ProductQuickView.vue'
 
 import productService from '@/admin/services/productService'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const router = useRouter()
 
 const search = ref('')
@@ -79,7 +81,7 @@ function getFrontImage(
     )
 
   return image
-    ? 'http://127.0.0.1:8000' +
+    ? API_URL +
         image.image_url
     : ''
 }
@@ -94,7 +96,7 @@ function getBackImage(
     )
 
   return image
-    ? 'http://127.0.0.1:8000' +
+    ? API_URL +
         image.image_url
     : getFrontImage(product)
 }
