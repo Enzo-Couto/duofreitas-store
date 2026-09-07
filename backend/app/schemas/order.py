@@ -28,9 +28,8 @@ class OrderItemResponse(BaseModel):
     quantity: int
     unit_price: float
 
-from datetime import datetime
-
 class OrderResponse(BaseModel):
+
     id: int
 
     customer_name: str
@@ -53,6 +52,10 @@ class OrderResponse(BaseModel):
 
     status: str
     payment_status: str
+
+    mercadopago_payment_id: str | None = None
+
+    checkout_url: str | None = None
 
     created_at: datetime
 

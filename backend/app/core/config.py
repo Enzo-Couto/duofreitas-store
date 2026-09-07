@@ -111,3 +111,11 @@ UPLOAD_DIR = os.getenv(
     "UPLOAD_DIR",
     "/storage/products"
 )
+
+MERCADOPAGO_SECRET_KEY = os.getenv(
+    "MERCADOPAGO_SECRET_KEY"
+)
+
+MERCADOPAGO_PUBLIC_ACCESS = os.getenv(
+    "MERCADOPAGO_PUBLIC_ACCESS"
+)

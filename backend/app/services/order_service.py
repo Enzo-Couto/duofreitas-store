@@ -6,6 +6,10 @@ from app.models.order import Order
 from app.models.order_item import OrderItem
 from app.models.product import Product
 
+from app.services.mercadopago_service import (
+    create_checkout_preference
+)
+
 from app.schemas.order import OrderCreate
 
 def create_order(
@@ -76,10 +80,75 @@ def create_order(
             )
         )
 
+    checkout_items = []
+
+    for item in order_items:
+
+        checkout_items.append({
+            "title": item["product"].name,
+            "quantity": item["quantity"],
+            "unit_price": float(
+                item["unit_price"]
+            )
+        })
+
+    payment = create_checkout_preference(
+        order.id,
+        checkout_items
+    )
+
+    print("PAYMENT RESPONSE:")
+    print(payment)
+
+    import json
+
+    print(
+        json.dumps(
+            payment,
+            indent=2,
+            ensure_ascii=False,
+            default=str
+        )
+    )
+
+    order.mercadopago_payment_id = payment["id"]
+
     db.commit()
     db.refresh(order)
 
-    return order
+    return {
+        "id": order.id,
+
+        "customer_name": order.customer_name,
+        "customer_email": order.customer_email,
+        "customer_phone": order.customer_phone,
+
+        "customer_cpf": order.customer_cpf,
+
+        "cep": order.cep,
+        "street": order.street,
+        "number": order.number,
+        "complement": order.complement,
+        "neighborhood": order.neighborhood,
+        "city": order.city,
+        "state": order.state,
+
+        "subtotal": float(order.subtotal),
+        "shipping_cost": float(order.shipping_cost),
+        "total_amount": float(order.total_amount),
+
+        "status": order.status,
+        "payment_status": order.payment_status,
+
+        "mercadopago_payment_id": order.mercadopago_payment_id,
+
+        "checkout_url": (
+            payment.get("sandbox_init_point")
+            or payment.get("init_point")
+        ),
+
+        "created_at": order.created_at
+    }
 
 
 from app.schemas.order import OrderListResponse
