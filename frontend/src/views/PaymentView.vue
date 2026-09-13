@@ -204,38 +204,6 @@ if (
           </div>
         </div>
 
-        <div
-          class="rounded-3xl border border-zinc-200 p-8"
-        >
-          <h2
-            class="mb-6 text-2xl font-semibold"
-          >
-            Método de Pagamento
-          </h2>
-
-          <div class="grid gap-4">
-
-            <button
-              class="rounded-xl border border-zinc-300 p-4 text-left transition hover:border-black"
-            >
-              PIX
-            </button>
-
-            <button
-              class="rounded-xl border border-zinc-300 p-4 text-left transition hover:border-black"
-            >
-              Cartão de Crédito
-            </button>
-
-            <button
-              class="rounded-xl border border-zinc-300 p-4 text-left transition hover:border-black"
-            >
-              Boleto
-            </button>
-
-          </div>
-        </div>
-
       </section>
 
       <!-- Resumo -->
