@@ -80,41 +80,26 @@ def create_order(
             )
         )
 
-    checkout_items = []
-
-    for item in order_items:
-
-        checkout_items.append({
-            "title": item["product"].name,
-            "quantity": item["quantity"],
-            "unit_price": float(
-                item["unit_price"]
-            )
-        })
-
-    payment = create_checkout_preference(
-        order.id,
-        checkout_items
-    )
-
-    print("PAYMENT RESPONSE:")
-    print(payment)
-
-    import json
-
-    print(
-        json.dumps(
-            payment,
-            indent=2,
-            ensure_ascii=False,
-            default=str
-        )
-    )
-
-    order.mercadopago_payment_id = payment["id"]
-
     db.commit()
     db.refresh(order)
+
+    items_mp = []
+
+    for item in order.order_items:
+        items_mp.append({
+            "title": item.product.name,
+            "quantity": item.quantity,
+            "currency_id": "BRL",
+            "unit_price": float(item.unit_price)
+        })
+
+    checkout = create_checkout_preference(
+        order.id,
+        items_mp
+    )
+
+    print("CHECKOUT:")
+    print(checkout.keys())
 
     return {
         "id": order.id,
@@ -142,10 +127,7 @@ def create_order(
 
         "mercadopago_payment_id": order.mercadopago_payment_id,
 
-        "checkout_url": (
-            payment.get("sandbox_init_point")
-            or payment.get("init_point")
-        ),
+        "checkout_url": checkout["init_point"],
 
         "created_at": order.created_at
     }

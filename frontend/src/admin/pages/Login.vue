@@ -17,7 +17,7 @@ async function login() {
     error.value = ''
 
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/auth/login`,
+      `${import.meta.env.VITE_API_BASE}/auth/login`,
       {
         email: email.value,
         password: password.value

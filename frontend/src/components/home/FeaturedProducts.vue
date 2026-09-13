@@ -38,7 +38,7 @@ function getFrontImage(product: any) {
     )
 
   return image
-    ? import.meta.env.VITE_API_URL +
+    ? import.meta.env.VITE_API_BASE +
         image.image_url
     : ''
 }
@@ -51,7 +51,7 @@ function getBackImage(product: any) {
     )
 
   return image
-    ? import.meta.env.VITE_API_URL +
+    ? import.meta.env.VITE_API_BASE +
         image.image_url
     : getFrontImage(product)
 }

@@ -47,7 +47,16 @@ def create_checkout_preference(
 ):
     preference_data = {
         "items": items,
-        "external_reference": str(order_id)
+
+        "external_reference": str(order_id),
+
+        "back_urls": {
+            "success": "https://duofreitas.online/order-success",
+            "failure": "https://duofreitas.online/payment-failure",
+            "pending": "https://duofreitas.online/payment-pending"
+        },
+
+        "auto_return": "approved"
     }
 
     result = sdk.preference().create(

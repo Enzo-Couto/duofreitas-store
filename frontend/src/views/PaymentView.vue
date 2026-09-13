@@ -77,12 +77,7 @@ async function proceedPayment() {
     const order =
       await createOrder(payload)
 
-    checkoutStore.orderId =
-      order.id
-
-    cartStore.clearCart()
-
-    router.push('/order-success')
+    window.location.href = order.checkout_url
 
   } catch (error) {
 
